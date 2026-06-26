@@ -1,0 +1,8 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+CREATE OR REPLACE FUNCTION uuid_v7_generate()
+RETURNS UUID
+LANGUAGE SQL
+AS $$
+  SELECT gen_random_uuid();
+$$;

@@ -1,0 +1,241 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-06-25T22:26:34.000Z",
+  "__export_source": "insomnia.desktop.app:v9.3.3",
+  "resources": [
+    {
+      "_id": "wrk_english_dictionary",
+      "_type": "workspace",
+      "name": "English Dictionary API",
+      "description": "Collection de chamadas da API",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_english_dictionary_base",
+      "_type": "environment",
+      "parentId": "wrk_english_dictionary",
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:3000",
+        "token": ""
+      }
+    },
+    {
+      "_id": "fld_system",
+      "_type": "request_group",
+      "parentId": "wrk_english_dictionary",
+      "name": "System"
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_english_dictionary",
+      "name": "Auth"
+    },
+    {
+      "_id": "fld_entries",
+      "_type": "request_group",
+      "parentId": "wrk_english_dictionary",
+      "name": "Entries"
+    },
+    {
+      "_id": "fld_user",
+      "_type": "request_group",
+      "parentId": "wrk_english_dictionary",
+      "name": "User"
+    },
+    {
+      "_id": "req_root",
+      "_type": "request",
+      "parentId": "fld_system",
+      "name": "GET /",
+      "method": "GET",
+      "url": "{{ _.base_url }}/",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_signup",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST /auth/signup",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/signup",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"User 1\",\n  \"email\": \"example@email.com\",\n  \"password\": \"test1234\"\n}"
+      }
+    },
+    {
+      "_id": "req_signin",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST /auth/signin",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/signin",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"example@email.com\",\n  \"password\": \"test1234\"\n}"
+      }
+    },
+    {
+      "_id": "req_entries_search",
+      "_type": "request",
+      "parentId": "fld_entries",
+      "name": "GET /entries/en",
+      "method": "GET",
+      "url": "{{ _.base_url }}/entries/en",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "search",
+          "value": "fire"
+        },
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "4"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_entries_detail",
+      "_type": "request",
+      "parentId": "fld_entries",
+      "name": "GET /entries/en/:word",
+      "method": "GET",
+      "url": "{{ _.base_url }}/entries/en/fire",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_entries_favorite",
+      "_type": "request",
+      "parentId": "fld_entries",
+      "name": "POST /entries/en/:word/favorite",
+      "method": "POST",
+      "url": "{{ _.base_url }}/entries/en/fire/favorite",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_entries_unfavorite",
+      "_type": "request",
+      "parentId": "fld_entries",
+      "name": "DELETE /entries/en/:word/unfavorite",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/entries/en/fire/unfavorite",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_user_me",
+      "_type": "request",
+      "parentId": "fld_user",
+      "name": "GET /user/me",
+      "method": "GET",
+      "url": "{{ _.base_url }}/user/me",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_user_history",
+      "_type": "request",
+      "parentId": "fld_user",
+      "name": "GET /user/me/history",
+      "method": "GET",
+      "url": "{{ _.base_url }}/user/me/history",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "4"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_user_favorites",
+      "_type": "request",
+      "parentId": "fld_user",
+      "name": "GET /user/me/favorites",
+      "method": "GET",
+      "url": "{{ _.base_url }}/user/me/favorites",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "4"
+        }
+      ],
+      "body": {}
+    }
+  ]
+}
