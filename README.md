@@ -1,98 +1,174 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# English Dictionary API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API RESTful para dicionário em inglês com autenticação JWT, busca/paginação de palavras, favoritos, histórico, cache e documentação OpenAPI (Swagger).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🎯 Propósito
 
-## Description
+Atender os casos de uso do desafio técnico:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Cadastro e login de usuários
+- Listagem de palavras com paginação e busca
+- Detalhe de palavra com proxy para Free Dictionary API
+- Registro de histórico de palavras consultadas
+- Gestão de palavras favoritas
+- Documentação da API e testes automatizados
 
-## Project setup
+## 📋 Regras de Negócio
 
-```bash
-$ npm install
+- **Autenticação**: JWT via `/auth/signup` e `/auth/signin`
+- **Registro**: email único por usuário e senha hasheada com `bcrypt`
+- **Histórico**: toda consulta em `/entries/en/:word` registra a palavra para o usuário autenticado
+- **Favoritos**: combinação `user_id + word` única
+- **Busca**: ILIKE com paginação por `page` e `limit`
+- **Proxy externo**: se a palavra não estiver no banco, busca em `https://api.dictionaryapi.dev`
+- **Cache**: resposta de detalhe de palavra com `x-cache: HIT|MISS` e `x-response-time`
+
+## 🏗️ Arquitetura
+
+O projeto segue organização em camadas:
+
+```
+src/
+├── domain/          # entidades e interfaces de repositório
+├── application/     # DTOs, models, use-cases, erros de negócio
+├── infrastructure/  # TypeORM, guards, filtros, cache, resposta HTTP
+├── presentation/    # controllers e modules por contexto
+└── scripts/         # scripts utilitários (importação de palavras)
 ```
 
-## Compile and run the project
+### 🔁 Injeção de Dependência
 
-```bash
-# development
-$ npm run start
+Os casos de uso dependem de interfaces/tokens (`USER_REPOSITORY`, `WORD_REPOSITORY`, etc), enquanto as implementações concretas ficam em `infrastructure/db/type-orm/repositories`.
 
-# watch mode
-$ npm run start:dev
+## ✅ Boas Práticas Implementadas
 
-# production mode
-$ npm run start:prod
+- NestJS + TypeScript strict
+- Repository Pattern com contratos no domínio
+- Migrations TypeORM (`synchronize: false`)
+- Filtros globais para erros HTTP e banco
+- Validação global com `ValidationPipe`
+- Cache em memória com TTL configurável
+- Swagger (OpenAPI 3) em `/api`
+- Testes unitários + E2E
+- Workflows GitHub Actions para unit e e2e
+
+## 📁 Estrutura de Pastas
+
+```
+.
+├── .github/workflows/
+│   ├── run-unit-tests.yml
+│   └── run-e2e-tests.yml
+├── docker/
+│   ├── docker-compose.yml
+│   ├── docker-compose-e2e.yml
+│   └── init.sql
+├── migrations/
+├── src/
+│   ├── application/
+│   ├── domain/
+│   ├── infrastructure/
+│   ├── presentation/
+│   └── scripts/
+├── test/
+│   ├── factories/
+│   ├── root.e2e-spec.ts
+│   ├── auth.e2e-spec.ts
+│   ├── entries.e2e-spec.ts
+│   └── user.e2e-spec.ts
+└── insomnia-collection.json
 ```
 
-## Run tests
+## 🚀 Como Iniciar
+
+### Pré-requisitos
+
+- Node.js 20+
+- Docker + Docker Compose
+
+### Passo a passo
 
 ```bash
-# unit tests
-$ npm run test
+# 1) Instalar dependências
+npm install
 
-# e2e tests
-$ npm run test:e2e
+# 2) Configurar env
+cp .env.example .env
 
-# test coverage
-$ npm run test:cov
+# 3) Subir PostgreSQL (dev)
+npm run db:up
+
+# 4) Executar migrations
+npx typeorm-ts-node-commonjs migration:run -d src/infrastructure/db/data-source.ts
+
+# 5) Iniciar API
+npm run start:dev
 ```
 
-## Deployment
+API disponível em `http://localhost:3000`  
+Swagger em `http://localhost:3000/api`
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## 📌 Comandos Disponíveis
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+| Comando | Descrição |
+|---|---|
+| `npm run start:dev` | Inicia API em desenvolvimento |
+| `npm run build` | Compila o projeto |
+| `npm run test` | Executa testes unitários |
+| `npm run test:e2e` | Executa testes E2E (com migrations e banco e2e) |
+| `npm run import:words` | Baixa e importa palavras do repositório dwyl |
+| `npm run db:up` / `npm run db:down` | Sobe/derruba banco local (5436) |
+| `npm run db:e2e:up` / `npm run db:e2e:down` | Sobe/derruba banco e2e (5437) |
+
+## 🐳 Docker
+
+- Banco principal: `docker/docker-compose.yml` (porta `5436`)
+- Banco E2E: `docker/docker-compose-e2e.yml` (porta `5437`)
+
+`docker/init.sql` cria extensão `pgcrypto` e função `uuid_v7_generate()`.
+
+## 🧪 Testes E2E
+
+Os E2E estão separados por path e usam factories para reuso:
+
+- `root.e2e-spec.ts`
+- `auth.e2e-spec.ts`
+- `entries.e2e-spec.ts`
+- `user.e2e-spec.ts`
+
+Factory de autenticação: `test/factories/auth.factory.ts`
+
+Para rodar:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run db:e2e:up
+npm run test:e2e
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 📚 Endpoints Principais
 
-## Resources
+| Método | Rota | Protegida |
+|---|---|---|
+| GET | `/` | Não |
+| POST | `/auth/signup` | Não |
+| POST | `/auth/signin` | Não |
+| GET | `/entries/en` | Sim |
+| GET | `/entries/en/:word` | Sim |
+| POST | `/entries/en/:word/favorite` | Sim |
+| DELETE | `/entries/en/:word/unfavorite` | Sim |
+| GET | `/user/me` | Sim |
+| GET | `/user/me/history` | Sim |
+| GET | `/user/me/favorites` | Sim |
 
-Check out a few resources that may come in handy when working with NestJS:
+## 🛠️ Stack
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+| Tecnologia | Versão |
+|---|---|
+| Node.js | 20+ |
+| NestJS | 11 |
+| TypeScript | 5 |
+| TypeORM | 0.3+ |
+| PostgreSQL | 16 |
+| JWT + Passport | 11 / 0.7 |
+| Jest + Supertest | 30 / 7 |
+| Swagger | OpenAPI 3 |
