@@ -55,7 +55,14 @@ async function bootstrap() {
     configService.get<string>('app.prefix') || '',
   );
 
-  await app.init(); // importante: init em vez de listen
+  // Se estiver na Vercel, apenas inicializa. Localmente, sobe o listener.
+  if (process.env.VERCEL) {
+    await app.init();
+  } else {
+    const port = configService.get<number>('app.port') ?? 3000;
+    await app.listen(port);
+    console.log(`Application is running locally on: http://localhost:${port}`);
+  }
 }
 
 bootstrap();
