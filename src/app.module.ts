@@ -37,6 +37,11 @@ import { AppRoutesModule } from './presentation/app/app-routes.module';
         database: configService.getOrThrow<string>('database.name'),
         synchronize: false,
         autoLoadEntities: true,
+        ssl: configService.get<boolean>('database.ssl')
+          ? { rejectUnauthorized: false }
+          : false,
+        retryAttempts: process.env.VERCEL ? 1 : 10,
+        retryDelay: 3000,
       }),
     }),
     AuthModule,

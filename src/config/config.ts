@@ -11,11 +11,12 @@ export const appConfig = registerAs('app', () => ({
 }));
 
 export const databaseConfig = registerAs('database', () => ({
-  host: process.env.DB_HOST ?? 'localhost',
-  port: toNumber(process.env.DB_PORT, 5436),
-  username: process.env.DB_USERNAME ?? 'postgres',
-  password: process.env.DB_PASSWORD ?? 'postgres',
-  name: process.env.DB_NAME ?? 'english_dictionary',
+  host: process.env.PGHOST || process.env.DB_HOST || 'localhost',
+  port: toNumber(process.env.PGPORT || process.env.DB_PORT, 5432),
+  username: process.env.PGUSER || process.env.DB_USERNAME || 'postgres',
+  password: process.env.PGPASSWORD || process.env.DB_PASSWORD || 'postgres',
+  name: process.env.PGDATABASE || process.env.DB_NAME || 'english_dictionary',
+  ssl: process.env.PGSSLMODE === 'require' || process.env.DB_SSL === 'true',
 }));
 
 export const authConfig = registerAs('auth', () => ({
