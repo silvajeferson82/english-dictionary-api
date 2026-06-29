@@ -28,21 +28,26 @@ import { AppRoutesModule } from './presentation/app/app-routes.module';
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
-        type: 'postgres',
-        host: configService.getOrThrow<string>('database.host'),
-        port: configService.getOrThrow<number>('database.port'),
-        username: configService.getOrThrow<string>('database.username'),
-        password: configService.getOrThrow<string>('database.password'),
-        database: configService.getOrThrow<string>('database.name'),
-        synchronize: false,
-        autoLoadEntities: true,
-        ssl: configService.get<boolean>('database.ssl')
-          ? { rejectUnauthorized: false }
-          : false,
-        retryAttempts: process.env.VERCEL ? 1 : 10,
-        retryDelay: 3000,
-      }),
+      useFactory: (configService: ConfigService): TypeOrmModuleOptions => {
+        const url = configService.get<string>('database.url');
+        return {
+          type: 'postgres',
+          ...(url
+            ? { url }
+            : {
+                host: configService.getOrThrow<string>('database.host'),
+                port: configService.getOrThrow<number>('database.port'),
+                username: configService.getOrThrow<string>('database.username'),
+                password: configService.getOrThrow<string>('database.password'),
+                database: configService.getOrThrow<string>('database.name'),
+              }),
+          synchronize: false,
+          autoLoadEntities: true,
+          ssl: url ? { rejectUnauthorized: false } : (configService.get<boolean>('database.ssl') ? { rejectUnauthorized: false } : false),
+          retryAttempts: process.env.VERCEL ? 1 : 10,
+          retryDelay: 3000,
+        };
+      },
     }),
     AuthModule,
     EntriesModule,

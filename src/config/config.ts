@@ -11,6 +11,7 @@ export const appConfig = registerAs('app', () => ({
 }));
 
 export const databaseConfig = registerAs('database', () => ({
+  url: process.env.POSTGRES_URL || process.env.DATABASE_URL,
   host: process.env.PGHOST || process.env.DB_HOST || 'localhost',
   port: toNumber(process.env.PGPORT || process.env.DB_PORT, 5432),
   username: process.env.PGUSER || process.env.DB_USERNAME || 'postgres',
