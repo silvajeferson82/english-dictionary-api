@@ -19,8 +19,10 @@ export class TypeormExceptionFilter implements ExceptionFilter {
       return;
     }
 
+    console.error('Database operation failed:', exception);
+
     response
       .status(HttpStatus.BAD_REQUEST)
-      .json(ApiResponse.fail('Database operation failed'));
+      .json(ApiResponse.fail(`Database operation failed: ${exception.message}`));
   }
 }
