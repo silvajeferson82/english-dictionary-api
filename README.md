@@ -79,6 +79,13 @@ Os casos de uso dependem de interfaces/tokens (`USER_REPOSITORY`, `WORD_REPOSITO
 └── insomnia-collection.json
 ```
 
+## 🌐 Acesso em Produção (Vercel)
+
+A aplicação e seus endpoints estão implantados publicamente na Vercel. 
+Você pode testar a API através da documentação interativa do Swagger:
+
+👉 **Swagger UI:** [https://english-dictionary-api.vercel.app/api](https://english-dictionary-api.vercel.app/api)
+
 ## 🚀 Como Iniciar
 
 ### Pré-requisitos
